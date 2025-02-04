@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch the Apples Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .basket {
+            position: absolute;
+            bottom: 20px;
+            width: 100px;
+            height: 50px;
+            background-color: brown;
+            border-radius: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .apple {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            border-radius: 50%;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body>
+	<p id = "score">Score: 0</p>
+    <div class="game-container">
+        <div id="basket" class="basket"></div>
+        <div id="apple" class="apple"></div>
+    </div>
+    <script>
+        document.addEventListener('mousemove', moveBasket);
+		scores = 0;
+
+        function moveBasket(event) {
+            const basket = document.getElementById('basket');
+            const container = basket.parentElement;
+            const containerRect = container.getBoundingClientRect();
+            const basketWidth = basket.offsetWidth;
+            const maxX = containerRect.width - basketWidth;
+
+            let mouseX = event.clientX - containerRect.left - (basketWidth / 2);
+            mouseX = Math.max(0, Math.min(mouseX, maxX));
+			mouseX += 50;
+            
+            basket.style.left = `${mouseX}px`;
+        }
+
+        let appleInterval;
+        startGame();
+
+        function startGame() {
+            const apple = document.getElementById('apple');
+            const container = apple.parentElement;
+            const containerRect = container.getBoundingClientRect();
+            const appleWidth = apple.offsetWidth;
+            const maxX = containerRect.width - appleWidth;
+
+            let appleY = 0;
+            let appleX = Math.random() * maxX;
+            apple.style.left = `${appleX}px`;
+
+            appleInterval = setInterval(() => {
+                appleY += 10;
+                if (appleY > containerRect.height - 30) {
+                    appleY = 0;
+                    appleX = Math.random() * maxX;
+                    apple.style.left = `${appleX}px`;
+                }
+                apple.style.top = `${appleY}px`;
+
+                checkCollision(apple, container.querySelector('#basket'));
+            }, 50);
+        }
+
+        function checkCollision(apple, basket) {
+            const appleRect = apple.getBoundingClientRect();
+            const basketRect = basket.getBoundingClientRect();
+
+            if (
+                appleRect.bottom > basketRect.top &&
+                appleRect.right > basketRect.left &&
+                appleRect.left < basketRect.right
+            ) {
+				scores += 1;
+                apple.style.top = '0px';
+				document.getElementById("score").text = scores;
+				console.log(scores);
+            }
+        }
+    </script>
+</body>
+</html>
